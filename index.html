@@ -23,15 +23,56 @@
 						<span class="position-absolute top-0 start-90 translate-middle-x badge bg-secondary text-light rounded-pill" id="cantCarrito">0</span>
 					</button>
 					<!-- LISTA CARRITO -->
-					<ul class="dropdown-menu dropdown-menu-dark bg-dark dropdown-menu-end" aria-labelledby="dropdownMenuButton2">
-						<li><a class="dropdown-item active" href="#">Action</a></li>
-						<li><a class="dropdown-item" href="#">Another action</a></li>
-						<li><a class="dropdown-item" href="#">Something else here</a></li>
-						<li><hr class="dropdown-divider"></li>
-						<li><a class="dropdown-item" href="#">Separated link</a></li>
-					</ul>
+					<div class="container w-50 dropdown-menu dropdown-menu-dark bg-dark dropdown-menu-end" aria-labelledby="dropdownMenuButton2">
+						<div class="d-flex justify-content-between align-items-center">
+							<div class="mt-2 ms-5">
+								<span class="text-muted">Tu carrito</span>
+								<p id="items-agregados">0 items agregados</p>
+							</div>
+							<div class="d-flex align-items-center">
+								<span class="me-4 lead" id="total-carrito">$0,00</span>
+								<button class="btn btn-success rounded-pill me-5 px-3">Comprar</button>
+							</div>
+						</div>
+						<!-- ITEMS EN CARRITO -->
+						<div id="lista-carrito">
+							
+						</div>
+						<!-- FIN ITEMS EN CARRITO -->
+
+						<!-- <table class="table table-dark table-striped table-hover">
+							<thead>
+								<tr>
+									<th scope="col">#</th>
+									<th scope="col">First</th>
+									<th scope="col">Last</th>
+									<th scope="col">Handle</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<th scope="row">1</th>
+									<td>Mark</td>
+									<td>Otto</td>
+									<td>@mdo</td>
+								</tr>
+								<tr>
+									<th scope="row">2</th>
+									<td>Jacob</td>
+									<td>Thornton</td>
+									<td>@fat</td>
+								</tr>
+								<tr>
+									<th scope="row">3</th>
+									<td colspan="2">Larry the Bird</td>
+									<td>@twitter</td>
+								</tr>
+							</tbody>
+						</table> -->
+					</div>
+					<!-- FIN LISTA CARRITO -->
 				</div>
-				<!-- FIN LISTA CARRITO -->
+				<!-- FIN CARRITO -->
 				<!-- BOTON NAVMENU DESPLEGABLE -->
 				<button
 					class="navbar-toggler"
@@ -87,7 +128,7 @@
 		</nav>
 		<!-- FIN NAVBAR -->
 		<!-- SECCION INICIAL -->
-		<section class="bg-primary text-success p-5 text-center mt-5 bg-image" style="background-image: url('src/img/bcg1.jpg'); height: 75vh; background-repeat: no-repeat; background-size: cover; background-position: center;;">
+		<section class="bg-primary text-success p-5 text-center mt-5 bg-image" style="background-image: url('src/img/bcg1.jpg'); height: 75vh; background-repeat: no-repeat; background-size: cover; background-position: center;">
 			<div class="container" >
 				<div class="mt-5 pt-4 align-items-center justify-content-center">
 						<h1>
@@ -147,6 +188,7 @@
 			</div>
 		</section>
 		<!-- FIN CATALOGO -->
+		<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 		<script src="js/main.js"></script>
 		<script
 			src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
