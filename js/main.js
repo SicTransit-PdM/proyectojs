@@ -1,4 +1,4 @@
-const juegos = [{
+const catalogo = [{
     id: 0,
     nombre: "FIFA 23",
     precio: 8999,
@@ -71,26 +71,36 @@ const juegos = [{
     img: "https://cdn2.steamgriddb.com/file/sgdb-cdn/grid/248fc45afe6980b6b520b592ff9de696.png"
 }]
 
-// CONTENEDOR CATALOGO
-let catalogo = document.querySelector(".catalogo-listado")
-// CARRITO
-let carrito = ["hola"]
-// ALERTA PRODUCTOS EN EL CARRITO
-let cantCarrito = document.querySelector("#cantCarrito")
-cantCarrito.textContent = carrito.length == 0 ? cantCarrito.classList.add("hidden") : `${carrito.length}`
-
 // FORMATO DE ESCRITURA PRECIOS
 let peso = new Intl.NumberFormat('es-AR', {
     style: 'currency',
     currency: 'ARS',
 })
+// CONTENEDOR CATALOGO HTML
+let catalogoHTML = document.querySelector(".catalogo-listado")
+// INICIALIZAR CARRITO O CARGAR DEL LOCALSTORAGE SI LO HUBIERA
+let carrito = JSON.parse(localStorage.getItem("carritoLS")) || []
+// INFO CANTIDAD DE ELEMENTOS EN EL CARRITO
+let cantCarrito = document.querySelector("#cantCarrito")
+cantCarrito.textContent = carrito.length == 0 ? cantCarrito.classList.add("hidden") : `${carrito.length}`
+let itemsAgregados = document.querySelector("#items-agregados")
+itemsAgregados.textContent = carrito.length == 1 ? "1 Item Agregado" : `${carrito.length} Items Agregados`
+// LISTA DEL CARRITO
+let listaCarrito = document.querySelector("#lista-carrito")
+// Subtotal de la lista del carrito
+let totalCarrito = 0
+document.querySelector("#total-carrito").innerHTML = peso.format(totalCarrito)
+// Solucion provisoria problema items duplicados en carrito al cargar el carrito LS (Usado en la funcion agregarCarrito y al inicializar la lista del carrito de HTML)
+let noInicializoLS = true
+
+
 
 // TARJETAS DE LA TIENDA
-juegos.forEach((juego, i) => {
+catalogo.forEach((juego, i) => {
     // Crear tarjeta
-    const card = document.createElement('div');
-    card.classList.add("card", "mb-3", "conchatuya");
-    card.setAttribute("style", "max-width: 540px;")
+    /*const card = document.createElement('div');
+    card.classList.add("card", "mb-3");
+    card.setAttribute("style", "max-width: 540px;")*/
     // Contenido tarjeta
     const content = `
     <!-- Tarjeta Item -->
@@ -105,7 +115,7 @@ juegos.forEach((juego, i) => {
                     <p class="card-text mt-4">${juego.descr}</p>
                     <div class="d-flex align-items-center justify-content-evenly flex-md-column">
                         <p class="card-text mt-4"><small class="text-warning p-2 h5 fw-bold">ARS${peso.format(juego.precio)}</small></p>
-                        <button type="button" class="btn btn-success rounded-pill btn-agregarCarrito" id="Item${juego.id}">Agregar al Carrito</button>
+                        <button type="button" class="btn btn-success rounded-pill btn-agregar" id="agregar-${juego.id}">Agregar al Carrito</button>
                     </div>
                 </div>
             </div>
@@ -113,7 +123,122 @@ juegos.forEach((juego, i) => {
     </div>
     <!-- Fin Tarjeta -->`;
     // Agrega tarjeta creada al contenedor
-    catalogo.innerHTML += content;
+    catalogoHTML.innerHTML += content;
+
 })
 
-let agregarCarrito = document.querySelectorAll(".btn-agregarCarrito").addEventListener
+// CARGAR LISTA DEL CARRITO DE LS
+if (localStorage.getItem("carritoLS")){
+    noInicializoLS = false
+    JSON.parse(localStorage.getItem("carritoLS")).forEach((juego, i) => {
+        agregarCarrito(i)
+        quitarLS(i)
+        totalCarrito -1
+        document.querySelector(`#agregar-${juego.id}`).classList.add("disabled") // Si estaba mas arriba no tenia boton que leer
+    })
+    noInicializoLS = true
+}
+
+// BOTON AGREGAR AL CARRITO
+const btnAgregar = document.querySelectorAll(".btn-agregar")
+btnAgregar.forEach((boton, i) => {
+    let botonAgregar = document.querySelector(`#agregar-${i}`)
+    botonAgregar.addEventListener('click', () => {
+        agregarCarrito(catalogo[i].id)
+        swal("Agregado!", `Agregaste ${catalogo[i].nombre} al carrito`, "success");
+        document.querySelector(`#agregar-${i}`).classList.add("disabled")
+    })
+})
+
+// BOTON QUITAR DEL CARRITO (alternativa dentro de la funcion agregarCarrito)
+/*function btnQuitar(){
+const btnQuitar = document.querySelectorAll(".btn-quitar")
+btnQuitar.forEach((boton, i) => {
+    let botonQuitar = document.querySelector(`#quitar-${i}`)
+    botonQuitar.addEventListener('click', () => {
+        quitarCarrito(catalogo[i].id)
+        alert(`Quitaste ${catalogo[i].nombre} del carrito`)
+    })
+})
+}*/
+
+// FuNCION AGREGAR UN CARRITO A LA LISTA
+function agregarCarrito(id){
+    // Busca el item con el id
+    let juego = catalogo.find(item => item.id === id)
+    // Lo agrega al array carrito
+    if (noInicializoLS){
+    carrito.push(juego)
+    }
+    // Lo agrega al localStorage
+    agregarLS(juego)
+    // localStorage.setItem("carritoLS", JSON.stringify(carritoLS))
+    // Crea el string con el código HTML
+    const content = `
+    <!-- Item en carrito -->
+    <div class="card mb-1 mx-lg-1 border border-primary bg-dark" id="item-${id}" style="max-width: 100%; height: 6rem">
+        <div class="row g-0">
+            <div class="col-md-4 px-md-0">
+                <img src=${juego.img} height="90" width="175" class="ms-1 rounded-start" alt="img">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body text-light">
+                    <h5 class="card-title text-warning fw-bold">${juego.nombre}</h5>
+                    <button type="button" class="btn btn-link btn-sm btn-quitar" id="quitar-${juego.id}">Quitar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Fin Item en carrito -->`;
+    // Pega el string en el contenedor HTML
+    listaCarrito.innerHTML += content
+    // Suma el precio del item al total
+    totalCarrito += juego.precio
+    // Calcula el monto total
+    document.querySelector("#total-carrito").innerHTML = peso.format(totalCarrito)
+    // Actualiza cantidad de elementos en el carrito
+    cantCarrito.textContent = carrito.length == 0 ? cantCarrito.classList.add("hidden") : `${carrito.length}`
+    itemsAgregados.textContent = carrito.length == 1 ? "1 Item Agregado" : `${carrito.length} Items Agregados`
+    // Agrega al localStorage
+    // BOTON QUITAR
+    let botonQuitar = document.querySelector(`#quitar-${id}`)
+    botonQuitar.addEventListener('click', () => {
+        swal("Eliminado", `Eliminaste ${juego.nombre} del carrito`, "info")
+        quitarCarrito(juego.id)
+    })
+    console.log(carrito)
+    console.log(totalCarrito)
+}
+
+// FUNCION QUITAR ELEMENTO DEL CARRITO
+function quitarCarrito(id){
+    // Quitar elemento del array carrito
+    console.log(`ANTES cant:${carrito.length} ${carrito}`)
+    carrito.splice(carrito.indexOf(carrito.find(item => item.id === id)), 1)
+    console.log(`DESPUES cant:${carrito.length} ${carrito}`)
+    // Quitar elemento del localStorage
+    quitarLS(id)
+    // Quitar elemento del carrito HTML
+    document.querySelector(`#item-${id}`).remove()
+    // Volver a activar boton de agregar
+    document.querySelector(`#agregar-${id}`).classList.remove("disabled")
+    // Actualizar el subtotal
+    totalCarrito -= catalogo[id].precio
+    document.querySelector("#total-carrito").innerHTML = peso.format(totalCarrito)
+    // Actualizar cantidad de elementos en el carrito
+    cantCarrito.textContent = carrito.length == 0 ? cantCarrito.classList.add("hidden") : `${carrito.length}`
+    itemsAgregados.textContent = carrito.length == 1 ? "1 Item Agregado" : `${carrito.length} Items Agregados`
+}
+
+function agregarLS(juego){
+    let carritoLS = JSON.parse(localStorage.getItem("carritoLS")) || []
+    carritoLS.push(juego)
+    localStorage.setItem("carritoLS", JSON.stringify(carritoLS))
+}
+
+function quitarLS(id){
+    let carritoLS = JSON.parse(localStorage.getItem("carritoLS")) || []
+    carrito.indexOf(carrito.find(item => item.id === id))
+    carritoLS.splice(id, 1)
+    localStorage.setItem("carritoLS", JSON.stringify(carritoLS))
+}
