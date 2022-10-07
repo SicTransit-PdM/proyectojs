@@ -172,7 +172,6 @@ function agregarCarrito(id){
     }
     // Lo agrega al localStorage
     agregarLS(juego)
-    // localStorage.setItem("carritoLS", JSON.stringify(carritoLS))
     // Crea el string con el código HTML
     const content = `
     <!-- Item en carrito -->
