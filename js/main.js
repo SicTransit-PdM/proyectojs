@@ -97,10 +97,6 @@ let noInicializoLS = true
 
 // TARJETAS DE LA TIENDA
 catalogo.forEach((juego, i) => {
-    // Crear tarjeta
-    /*const card = document.createElement('div');
-    card.classList.add("card", "mb-3");
-    card.setAttribute("style", "max-width: 540px;")*/
     // Contenido tarjeta
     const content = `
     <!-- Tarjeta Item -->
@@ -147,22 +143,18 @@ btnAgregar.forEach((boton, i) => {
         agregarCarrito(catalogo[i].id)
         swal("Agregado!", `Agregaste ${catalogo[i].nombre} al carrito`, "success");
         document.querySelector(`#agregar-${i}`).classList.add("disabled")
+        // Solucion quitar carritos
+        Array.from(document.querySelectorAll('.btn-quitar')).forEach(e => {
+            e.addEventListener('click', () => {
+                let fullId = e?.id
+                swal("Eliminado", `Eliminaste ${catalogo[fullId[fullId.length -1]].nombre} del carrito`, "info")
+                quitarCarrito(fullId[fullId.length -1])
+            })
+        })
     })
 })
 
-// BOTON QUITAR DEL CARRITO (alternativa dentro de la funcion agregarCarrito)
-/*function btnQuitar(){
-const btnQuitar = document.querySelectorAll(".btn-quitar")
-btnQuitar.forEach((boton, i) => {
-    let botonQuitar = document.querySelector(`#quitar-${i}`)
-    botonQuitar.addEventListener('click', () => {
-        quitarCarrito(catalogo[i].id)
-        alert(`Quitaste ${catalogo[i].nombre} del carrito`)
-    })
-})
-}*/
-
-// FuNCION AGREGAR UN CARRITO A LA LISTA
+// FUNCION AGREGAR UN CARRITO A LA LISTA
 function agregarCarrito(id){
     // Busca el item con el id
     let juego = catalogo.find(item => item.id === id)
@@ -198,7 +190,6 @@ function agregarCarrito(id){
     // Actualiza cantidad de elementos en el carrito
     cantCarrito.textContent = carrito.length == 0 ? cantCarrito.classList.add("hidden") : `${carrito.length}`
     itemsAgregados.textContent = carrito.length == 1 ? "1 Item Agregado" : `${carrito.length} Items Agregados`
-    // Agrega al localStorage
     // BOTON QUITAR
     let botonQuitar = document.querySelector(`#quitar-${id}`)
     botonQuitar.addEventListener('click', () => {
@@ -212,9 +203,7 @@ function agregarCarrito(id){
 // FUNCION QUITAR ELEMENTO DEL CARRITO
 function quitarCarrito(id){
     // Quitar elemento del array carrito
-    console.log(`ANTES cant:${carrito.length} ${carrito}`)
     carrito.splice(carrito.indexOf(carrito.find(item => item.id === id)), 1)
-    console.log(`DESPUES cant:${carrito.length} ${carrito}`)
     // Quitar elemento del localStorage
     quitarLS(id)
     // Quitar elemento del carrito HTML
